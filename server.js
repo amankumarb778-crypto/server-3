@@ -38,11 +38,6 @@ const states = [
     { id: 28, name: "West Bengal", population: 91276115, literacyRate: 76.26, annualBudget: 310000, gdp: 16000000 }
 ];
 
-
-//get routes
-
-
-
 app.get("/states", (req, res) => {
     res.status(200).json(states);
 });
@@ -57,15 +52,12 @@ app.get("/states/highest-gdp", (req, res) => {
 app.get("/states/:id", (req, res) => {
     const stateId = Number(req.params.id);
     const state = states.find(u => u.id === stateId);
-
     if (!state) {
-        return res.status(404).json({ message: "State not Found" }); // ⚠️ FIX: added return
+        return res.status(404).json({ message: "State not found" });
     }
-
     res.status(200).json(state);
 });
 
-//post-routes
 app.post("/states", (req, res) => {
     const newState = {
         id: states.length + 1,
@@ -79,171 +71,107 @@ app.post("/states", (req, res) => {
     res.status(201).json(newState);
 });
 
-
-// PUT ROUTES
-
-
 app.put("/states/:id", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "Id not Found" }); 
+        return res.status(404).json({ message: "State not found" });
     }
-
     states[index] = {
-        id: stateId, 
+        id: stateId,
         name: req.body.name,
         population: req.body.population,
         literacyRate: req.body.literacyRate,
         annualBudget: req.body.annualBudget,
         gdp: req.body.gdp
     };
-
-    res.status(200).json({ message: "Replaced the State Successfully", updatedState: states[index] });
+    res.status(200).json(states[index]);
 });
 
 app.put("/states/:id/budget", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "Index Not Found" });
+        return res.status(404).json({ message: "State not found" });
     }
-
     states[index].annualBudget = req.body.annualBudget;
-
-    res.status(200).json({ message: "Budget Is Updated", updatedBudget: states[index] });
+    res.status(200).json(states[index]);
 });
 
 app.put("/states/:id/population", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "Index Not Found" });
+        return res.status(404).json({ message: "State not found" });
     }
-
-    const { population } = req.body;
-
-    if (typeof population !== "number" || population < 0) {
-        return res.status(400).json({ message: "Invalid Population Value" }); 
-    }
-
-    states[index].population = population;
-
-    res.status(200).json({ message: "Population is Updated", updatedPopulation: states[index] });
+    states[index].population = req.body.population;
+    res.status(200).json(states[index]);
 });
-
-// PATCH ROUTES
-
 
 app.patch("/states/:id/literacy", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "Index Not Found" }); 
+        return res.status(404).json({ message: "State not found" });
     }
-
-    const { literacyRate } = req.body;
-
-    if (typeof literacyRate !== "number" || literacyRate < 0) {
-        return res.status(400).json({ message: "Literacy Not valid" }); 
-    }
-
-    states[index].literacyRate = literacyRate;
-
-    res.status(200).json({ message: "LiteracyRate is Updated Successfully", updatedLiteracyRate: states[index] });
+    states[index].literacyRate = req.body.literacyRate;
+    res.status(200).json(states[index]);
 });
 
 app.patch("/states/:id/gdp", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "Index Not Found" }); 
+        return res.status(404).json({ message: "State not found" });
     }
-
-    const { gdp } = req.body;
-
-    if (typeof gdp !== "number" || gdp < 0) {
-        return res.status(400).json({ message: "GDP Not valid" }); 
-    }
-
-    states[index].gdp = gdp;
-
-    res.status(200).json({ message: "GDP is Updated Successfully", updatedGDP: states[index] }); 
+    states[index].gdp = req.body.gdp;
+    res.status(200).json(states[index]);
 });
-
 
 app.patch("/states/:id", (req, res) => {
     const stateId = Number(req.params.id);
     const index = states.findIndex(u => u.id === stateId);
-
     if (index === -1) {
-        return res.status(404).json({ message: "State Not Found" });
+        return res.status(404).json({ message: "State not found" });
     }
-
-    // Only update fields that are provided in body
-    const allowedFields = ["name", "population", "literacyRate", "annualBudget", "gdp"];
-    allowedFields.forEach(field => {
-        if (req.body[field] !== undefined) {
-            states[index][field] = req.body[field];
-        }
-    });
-
-    res.status(200).json({ message: "State Partially Updated", updatedState: states[index] });
+    if (req.body.name !== undefined) states[index].name = req.body.name;
+    if (req.body.population !== undefined) states[index].population = req.body.population;
+    if (req.body.literacyRate !== undefined) states[index].literacyRate = req.body.literacyRate;
+    if (req.body.annualBudget !== undefined) states[index].annualBudget = req.body.annualBudget;
+    if (req.body.gdp !== undefined) states[index].gdp = req.body.gdp;
+    res.status(200).json(states[index]);
 });
 
-// DELETE ROUTES
-
-// ✅ NEW: DELETE /states/:id
-app.delete("/states/:id", (req, res) => {
-    const stateId = Number(req.params.id);
-    const index = states.findIndex(u => u.id === stateId);
-
-    if (index === -1) {
-        return res.status(404).json({ message: "State Not Found" });
-    }
-
-    states.splice(index, 1);
-    res.status(204).send(); 
-});
-
-// ✅ NEW: DELETE /states/name/:stateName — case-insensitive
 app.delete("/states/name/:stateName", (req, res) => {
     const stateName = req.params.stateName.toLowerCase();
     const index = states.findIndex(u => u.name.toLowerCase() === stateName);
-
     if (index === -1) {
-        return res.status(404).json({ message: "State Not Found" });
+        return res.status(404).json({ message: "State not found" });
     }
-
     states.splice(index, 1);
     res.status(204).send();
 });
 
-
 app.delete("/states/low-literacy/:percentage", (req, res) => {
     const percentage = Number(req.params.percentage);
-
-    if (isNaN(percentage)) {
-        return res.status(400).json({ message: "Invalid percentage value" });
-    }
-
     const before = states.length;
-
-
     for (let i = states.length - 1; i >= 0; i--) {
         if (states[i].literacyRate < percentage) {
             states.splice(i, 1);
         }
     }
-
     const deletedCount = before - states.length;
-
     res.status(200).json({ deletedCount });
+});
+
+app.delete("/states/:id", (req, res) => {
+    const stateId = Number(req.params.id);
+    const index = states.findIndex(u => u.id === stateId);
+    if (index === -1) {
+        return res.status(404).json({ message: "State not found" });
+    }
+    states.splice(index, 1);
+    res.status(204).send();
 });
 
 app.listen(PORT, () => {
